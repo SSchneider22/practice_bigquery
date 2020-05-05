@@ -568,12 +568,14 @@ FROM
 |"%A"|その日時の曜日(Fridayなど)|
 |"%B"|その日時の月(Decemberなど)|
 |"%F"|YYYY-MM-DD|
+<br>
 上記以外にもたくさんのフォーマットがある、下記公式ドキュメントを参照。<br>
 https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators?hl=ja#supported_format_elements_for_timestamp
 
 <br>
 使用するDBによって、表記と使い方が異なるため要確認。<br>
 以下は、「FORMAT_DATE」の例
+
 - FORMAT_DATE：Bigquery
 - DATE_FORMAT：MySQL
 - FORMAT関数などを駆使して、個別に作る必要あり：SQL Server,Redshift,PostgreSQL,Oracle
