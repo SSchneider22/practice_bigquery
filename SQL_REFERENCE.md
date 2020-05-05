@@ -7,7 +7,7 @@ SQLの各種句や式の説明とサンプルを記載したものです。
 https://www.kaggle.com/c/recruit-restaurant-visitor-forecasting/data
 
 ## サンプルSQL実行環境
-Bigquery を使用 (ダウンロードしたCSVをアップロードしています) <br>
+「Bigqueryの標準SQL」 を使用 (ダウンロードしたCSVをアップロードしています) <br>
 以下、私のクエリ実行時の環境を記載。
 - プロジェクトID：bigquery-trial-243206
 - データセット名：kaggle_recruit_data
@@ -15,7 +15,7 @@ Bigquery を使用 (ダウンロードしたCSVをアップロードしていま
 
 # 文 statement
 1つの実行単位となる。
-製品によって、末尾に「;」が必須
+使用するDB製品によっては、末尾に「;」が必須
 
 ## SELECT文
 ### 説明
@@ -34,7 +34,8 @@ Bigquery を使用 (ダウンロードしたCSVをアップロードしていま
 
 
 
-# 主要な「句」 clause
+# 主要な句
+主要な「句 clause」について説明。<br>
 節ともいう。文、またはクエリの構成要素。
 最低限、句で改行すると読みやすいクエリになる。
 
@@ -84,24 +85,25 @@ FROM
 
 ### WHERE句で使用できる比較演算子
 
-|演算子|内容|
-|-|-|
-|=	|等しい|
-|<	|小さい|
-|>	|大きい|
-|<=	|以下|
-|>=	|以上|
-|<>, !=	|等しくない|
+| 演算子 | 内容       |
+| ------ | ---------- |
+| =      | 左項と右項が等しい     |
+| <      | 左項が右項未満     |
+| >      | 左項が右項より大きい     |
+| <=     | 左項が右項以下       |
+| >=     | 左項が右項以上       |
+| <>, != | 左項と右項が等しくない |
 
 ### WHERE句で使用できる論理演算子
-|演算子|内容|
-|-|-|
-|AND	|論理積，　○○かつ○○|
-|NOT	|否定，　○○でない|
-|OR	    |論理和，　○○または○○|
+| 演算子 | 内容                 |
+| ------ | -------------------- |
+| AND    | ●●かつ▲▲   |
+| NOT    | ●●でない     |
+| OR     | ●●または▲▲ |
 
 ### 例
 1. 2016年以前のデータを取得したいとき
+
 ```
 SELECT
   air_store_id,
@@ -113,6 +115,7 @@ WHERE
 ```
 
 2. 2017年1月1日～12月31日のデータを取得したいとき。visit_datetimeはTIMESTAMP
+
 ```
 SELECT
   air_store_id,
@@ -124,6 +127,7 @@ WHERE
 ```
 
 3. reserve_visitorsが2,4,9のデータのみ取得したいとき
+
 ```
 SELECT
   air_store_id,
@@ -136,6 +140,7 @@ WHERE
 ```
 
 4. reserve_visitorsが2,4,9「以外」かつ2017年1月1日～12月31日のデータのみ取得したいとき
+
 ```
 SELECT
   air_store_id,
@@ -149,6 +154,7 @@ WHERE
 ```
 
 5. NULL値を持つデータを取得したいとき
+
 ```
 SELECT
   air_store_id,
@@ -161,6 +167,7 @@ WHERE
 ```
 
 6. NULL値でないデータを取得したいとき
+
 ```
 SELECT
   air_store_id,
@@ -174,6 +181,7 @@ WHERE
 
 7. ワイルドカードを用いて、前半部分一致で検索したいとき<br>
    （以下の例では、air_area_nameが「Tōkyō-to」から始まるレコードを抽出）
+
 ```
 SELECT
   air_store_id,
@@ -230,13 +238,13 @@ ORDER BY
 各結合の内容については、以下のURLが参考になる。<br>
 https://www.sejuku.net/blog/73650
 
-|名称|内容|
-|-|-|
-|LEFT OUTER JOIN|左外部結合
-|RIGHT OUTER JOIN|右外部結合
-|FULL OUTER JOIN|完全外部結合
-|INNER JOIN|内部結合
-|CROSS JOIN|交差結合
+| 名称             | 内容         |
+| ---------------- | ------------ |
+| LEFT OUTER JOIN  | 左外部結合   |
+| RIGHT OUTER JOIN | 右外部結合   |
+| FULL OUTER JOIN  | 完全外部結合 |
+| INNER JOIN       | 内部結合     |
+| CROSS JOIN       | 交差結合     |
 ### 例
 1. air_reserveに対して、air_store_infoを左外部結合する。<br>
    (予約データに対してお店の情報を付け足す、というイメージ)
@@ -259,13 +267,13 @@ ON
 ### 説明
 指定した条件と集計キーに応じて、結果を集計（複数レコードをまとめる）ことが出来る
 ### 集計関数一覧
-|名称|内容|
-|-|-|
-|SUM|集計された行の中で、指定した列の合計を出力
-|MAX|集計された行の中で、指定した列の最大値を出力
-|MIN|集計された行の中で、指定した列の最小値を出力
-|AVG|集計された行の中で、指定した列の最小値を出力
-|COUNT|集計された行の数を出力
+| 名称  | 内容                                         |
+| ----- | -------------------------------------------- |
+| SUM   | 集計された行の中で、指定した列の合計を出力   |
+| MAX   | 集計された行の中で、指定した列の最大値を出力 |
+| MIN   | 集計された行の中で、指定した列の最小値を出力 |
+| AVG   | 集計された行の中で、指定した列の最小値を出力 |
+| COUNT | 集計された行の数を出力                       |
 ### 例
 1. air_store_id別に、reserve_visitorsの合計を出力
 ```
@@ -292,24 +300,151 @@ FROM
 ### 説明
 出力結果を式内で指定した条件で抽出結果を変えることができる式
 ### ポイント
-**必ず「ELSE」を入れること！！**入れないと、条件に一致しない場合NULLになってしまう
+**必ず「ELSE」を入れること！！** 入れないと、条件に一致しない場合NULLになってしまう
 ### 例
+1. reserve_datetimeとvisit_datetimeの日付の差が1日以上、<br>
+   つまり前日までに予約がされているならばTRUE、<br>
+   そうでないならばFALSEを出力
+```
+SELECT
+  hpg_store_id,
+  visit_datetime,
+  reserve_datetime,
+  reserve_visitors,
+  CASE WHEN TIMESTAMP_DIFF(visit_datetime, reserve_datetime, DAY) > 0 THEN TRUE
+    ELSE FALSE
+    END AS `RESERVED_BY_PREVIOUSDAY`
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_reserve`
+```
+
 
 
 # 文字列関数
 
 ## LENGTH関数
 ### 説明
-指定した列の長さを返す関数
+指定した列の各データの文字数を返す関数
+### 例
+1. hpg_genre_nameの文字数を出力
+```
+SELECT
+  hpg_store_id,
+  hpg_genre_name,
+  LENGTH(hpg_genre_name) AS charcount_genre_name
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+## TRIM関数
+### 説明
+指定した列のデータに対して、
+- 引数無しの場合：左右のスペースを削除
+- 引数ありの場合：削除したい文字を引数に入れ、その文字を削除する
+### 例
+1. hpg_genre_nameのデータに含まれている「 style」を削除
+```
+SELECT
+  hpg_store_id,
+  hpg_genre_name,
+  TRIM(hpg_genre_name, ' style') AS trim_genre_name
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+## REPLACE関数
+### 説明
+指定した列のデータに対して、置換前と置換後の文字を指定して置き換える
+### 例
+1. hpg_genre_nameのデータに含まれている「style」を「restaurant」に置換
+```
+SELECT
+  hpg_store_id,
+  hpg_genre_name,
+  REPLACE(hpg_genre_name, 'style', 'restaurant') AS trim_genre_name
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+## SUBSTR関数
+### 説明
+指定した列のデータに対して、文字列の一部を抽出する関数<br>
+DB製品によって、関数名が異なるため注意。使い方は同じ。
+- SUBSTR : Bigquery,Oracle,PostgreSQL
+- SUBSTERING : SQL Server,MySQL
+### 例
+1. hpg_store_idの1文字目～3文字目を抽出
+```
+SELECT
+  hpg_store_id,
+  hpg_genre_name,
+  SUBSTR(hpg_store_id, 1,3) AS trim_genre_name
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+# 数値関数
+
+## ROUND関数
+### 説明
+指定した列のデータに対して、指定桁で四捨五入する関数
+### 例
+1. latitudeを、少数第一位で四捨五入
+```
+SELECT
+  latitude,
+  ROUND(latitude, 0) AS ROUND_latitude
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+## TRUNC関数
+### 説明
+指定した列のデータに対して、指定桁で切り捨てる関数
+### 例
+1. latitudeを、少数第一位で切り捨て
+```
+SELECT
+  latitude,
+  TRUNC(latitude, 0) AS ROUND_latitude
+FROM
+  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+```
+
+
+
+# 日付関数
+
+## 日付関数を使用する際の”part”について
+
+## CURRENT_TIMESTAMP関数
+### 説明
+現在の日付・時刻をタイムスタンプで取得する関数
+同様の関数として、CURRENT_DATE、CURRENT_TIMEなどがある。
+### 例
+```
+SELECT
+  CURRENT_TIMESTAMP()
+```
+
+## 
+
+
+
+
+# 複数のクエリに対する操作
+
+## CURRENT_TIMESTAMP関数
+### 説明
+現在の日付・時刻をタイムスタンプで取得する関数
+同様の関数として、CURRENT_DATE、CURRENT_TIMEなどがある。
 ### 例
 
-## TRIM関数　など、他にもたくさんある。https://qiita.com/tatsuya4150/items/69c2c9d318e5b93e6ccd#except
 
 
-
-
-
-# 副問合せ sub-query
+# 副問合せ(サブクエリ)
+あるクエリの結果に対して、別のクエリを実行したいときに使用するのが副問合せ、サブクエリとも言う。<br>
+FROM句の中で書くことも出来るが、可読性が落ちる場合が多いため、WITH句で書くことを推奨。
 
 
 
@@ -325,12 +460,12 @@ FROM
 
 
 
-# サンプル sample
+## サンプル sample
 
-## サンプル句
-### 説明
+### サンプル句
+#### 説明
 ～～～～～～～、するための句
-### 例
+#### 例
 1. ～～～～～～、のデータを取得したいとき
 ```
 SELECT
