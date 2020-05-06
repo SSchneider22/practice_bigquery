@@ -17,7 +17,6 @@ https://www.kaggle.com/c/recruit-restaurant-visitor-forecasting/data
 https://cloud.google.com/bigquery/docs/sandbox?hl=ja
 
 以下、私のサンプルクエリ実行時のデータセット等の情報を記します。
-- プロジェクトID：bigquery-trial-243206
 - データセット名：kaggle_recruit_data
 - 各テーブル名：元のCSVの名称をそのまま使用
 
@@ -62,7 +61,7 @@ https://cloud.google.com/bigquery/docs/sandbox?hl=ja
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
 2. 指定したテーブルから、指定した列を取得
@@ -71,7 +70,7 @@ SELECT
   reserve_visitors,
   visit_datetime
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
 3. 指定したテーブルから、指定した列を取得。ただし、レコードに重複がある場合は削除
@@ -79,7 +78,7 @@ FROM
 SELECT DISTINCT
   reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
 4. 指定した列の名称を変更した上で取得
@@ -87,7 +86,7 @@ FROM
 SELECT DISTINCT
   reserve_visitors AS vistor
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
 ### SQLで使用できる比較演算子(=,<,>など)
@@ -121,7 +120,7 @@ SELECT
   air_store_id,
   visit_datetime
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   visit_datetime < '2017-01-01'
 ```
@@ -133,7 +132,7 @@ SELECT
   air_store_id,
   visit_datetime
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   visit_datetime BETWEEN '2017-01-01' AND '2017-12-31'
 ```
@@ -146,7 +145,7 @@ SELECT
   visit_datetime,
   reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   reserve_visitors IN (2, 4, 9)
 ```
@@ -159,7 +158,7 @@ SELECT
   visit_datetime,
   reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   reserve_visitors NOT IN (2, 4, 9)
   AND (visit_datetime BETWEEN '2017-01-01' AND '2017-12-31')
@@ -173,7 +172,7 @@ SELECT
   visit_datetime,
   reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   reserve_visitors IS NULL
 ```
@@ -186,7 +185,7 @@ SELECT
   visit_datetime,
   reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 WHERE
   reserve_visitors IS NOT NULL
 ```
@@ -200,7 +199,7 @@ SELECT
   air_genre_name,
   air_area_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_area_name LIKE 'Tōkyō-to%'
 /* LIKEは、「_」で何かしらの1文字が入る、という検索も可能*/
@@ -215,7 +214,7 @@ WHERE
 SELECT DISTINCT
   reserve_visitors AS vistor
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ORDER BY
   reserve_visitors ASC
 ```
@@ -225,7 +224,7 @@ ORDER BY
 SELECT DISTINCT
   reserve_visitors AS vistor
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ORDER BY
   reserve_visitors DESC
 ```
@@ -236,7 +235,7 @@ SELECT
   reserve_visitors,
   visit_datetime
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ORDER BY
   reserve_visitors ASC, visit_datetime DESC
 ```
@@ -267,17 +266,19 @@ SELECT
   S.air_genre_name,
   S.air_area_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve` R
+  `kaggle_recruit_data.air_reserve` R
 LEFT OUTER JOIN
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info` S
+  `kaggle_recruit_data.air_store_info` S
 ON
   R.air_store_id = S.air_store_id
 ```
 
 
-### GROUP BY句
+### GROUP BY句・HAVING句
 #### 説明
-指定した条件と集計キーに応じて、結果を集計（複数レコードをまとめる）ことが出来る
+指定した条件と集計キーに応じて、結果を集計（複数レコードをまとめる）ことが出来る。<br>
+GROUP BYで集計した結果に対して、WHERE句のような絞り込みを行いたい場合は、HAVING句を用いる。
+
 #### 集計関数一覧
 | 名称  | 内容                                         |
 | ----- | -------------------------------------------- |
@@ -287,23 +288,36 @@ ON
 | AVG   | 集計された行の中で、指定した列の最小値を出力 |
 | COUNT | 集計された行の数を出力                       |
 #### 例
-1. air_store_id別に、reserve_visitorsの合計を出力
+1. テーブル内のレコード総数を出力する
+```
+SELECT
+  COUNT(*) AS record_count
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
+
+2. air_store_id別に、reserve_visitorsの合計を出力
 ```
 SELECT
   air_store_id,
   SUM(reserve_visitors) AS sum_reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 GROUP BY
   air_store_id
 ```
 
-2. テーブル内のレコード総数を出力する
+3. air_store_id別の、reserve_visitorsの合計値が100以上のデータを出力
 ```
 SELECT
-  COUNT(*) AS record_count
+  air_store_id,
+  SUM(reserve_visitors) AS sum_reserve_visitors
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
+GROUP BY
+  air_store_id
+HAVING
+  sum_reserve_visitors >= 100
 ```
 
 ## 式 experssion
@@ -327,7 +341,7 @@ SELECT
     ELSE FALSE
     END AS `RESERVED_BY_PREVIOUSDAY`
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_reserve`
+  `kaggle_recruit_data.hpg_reserve`
 ```
 
 
@@ -345,7 +359,7 @@ SELECT
   hpg_genre_name,
   LENGTH(hpg_genre_name) AS charcount_genre_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
 ### TRIM関数
@@ -361,7 +375,7 @@ SELECT
   hpg_genre_name,
   TRIM(hpg_genre_name, ' style') AS trim_genre_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
 ### REPLACE関数
@@ -375,7 +389,7 @@ SELECT
   hpg_genre_name,
   REPLACE(hpg_genre_name, 'style', 'restaurant') AS trim_genre_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
 ### SUBSTR関数
@@ -392,10 +406,54 @@ SELECT
   hpg_genre_name,
   SUBSTR(hpg_store_id, 1,3) AS trim_genre_name
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
-## 数値関数
+### CONCAT関数・||演算子
+#### 説明
+複数の文字列を連結することが出来る関数<br>
+||を用いても連結が可能。DB製品によっては、どちらかしか用意されていない場合もあるため、要確認。
+#### 例
+1. air_store_idとair_genre_nameを、「_」を間に挟んで連結する。CONCAT関数を使用したとき。
+```
+SELECT
+  air_store_id,
+  air_genre_name,
+  CONCAT(air_store_id,'_',air_genre_name)
+FROM `kaggle_recruit_data.air_store_info`
+```
+2. air_store_idとair_genre_nameを、「_」を間に挟んで連結する。||演算子を使用したとき。
+```
+SELECT
+  air_store_id,
+  air_genre_name,
+  air_store_id || '_' || air_genre_name
+FROM `kaggle_recruit_data.air_store_info`
+```
+
+
+## 数学関数
+公式ドキュメントは以下<br>
+https://cloud.google.com/bigquery/docs/reference/standard-sql/mathematical_functions?hl=ja#sign
+
+### 基本的な数学関数
+少し説明がわかりづらいROUNDとTRUNC以外は、以下の表にまとめる。
+
+|項目|SQLでの演算子・関数名|使い方|
+|-|-|-|
+|足し算|+|(数値型)+(数値型)|
+|引き算|-|(数値型)-(数値型)|
+|掛け算|* |(数値型)*(数値型)|
+|割り算|/|(数値型)/(数値型)|
+|余剰の計算|MOD()|MOD(X,Y) --> XをYで割った余りを返す|
+|絶対値|ABS()|ABS(X) --> Xの絶対値を返す|
+|三角関数|SIN(),COS(),TAN()|SIN(X) --> Xのサインを返す(-1~1)|
+|指数関数|EXP()|EXP(X) --> eのX乗を返す|
+|自然対数|LN()|LN(X) --> Xの自然対数（eを底とする対数）を返す|
+|常用対数|LOG10()|LOG10(X) --> 10を底とする対数を返す|
+|べき乗|POW(),POWER()|POW(X,Y) --> XをY乗した値を返す|
+|平方根|SQRT()|SQRT(X) --> Xの平方根を返す|
+|符号の出力(-1,0,+1を出力)|SIGN()|SIGN(X) --> Xの符号を返す|
 
 ### ROUND関数
 #### 説明
@@ -407,7 +465,7 @@ SELECT
   latitude,
   ROUND(latitude, 0) AS ROUND_latitude
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
 ### TRUNC関数
@@ -420,7 +478,7 @@ SELECT
   latitude,
   TRUNC(latitude, 0) AS ROUND_latitude
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.hpg_store_info`
+  `kaggle_recruit_data.hpg_store_info`
 ```
 
 
@@ -490,7 +548,7 @@ SELECT
   visit_datetime,
   EXTRACT(HOUR FROM visit_datetime) AS hour_of_visit_datetime
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
 ### (DATE/TIME/DATETIME/TIMESTAMP)_DIFF関数
@@ -510,7 +568,7 @@ SELECT
   reserve_datetime,
   TIMESTAMP_DIFF(visit_datetime, reserve_datetime, DAY) AS day_diff
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 2. DATE型のvisit_dateと、CURRENT_DATE()で今日の日付をDATE型で取得したときの、月差(MONTH)を取得
 ```
@@ -519,7 +577,7 @@ SELECT
   visit_date,
   DATE_DIFF(visit_date, CURRENT_DATE(), MONTH) AS month_diff
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_visit_data`
+  `kaggle_recruit_data.air_visit_data`
 ```
 
 ### (DATE/TIME/DATETIME/TIMESTAMP)_ADD関数
@@ -531,9 +589,26 @@ FROM
 - DATEADD：SQL Server,Redshift
 - DATEADD関数無し、個別に演算作る必要あり：PostgreSQL,Oracle
 #### 例
-1. aaaaaaaここから！！！！！！！！！！！！
+1. TIMESTAMP型のreserve_datetimeに、1日加算した値を出力
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  TIMESTAMP_ADD(reserve_datetime, INTERVAL 1 DAY) AS reserve_datetime_add1day
+FROM
+  `kaggle_recruit_data.air_reserve`
 ```
 
+2. TIMESTAMP型のreserve_datetimeに、1か月加算した値を出力(TIMESTAMP型はpart:MONTHに対応していないため、DATE()でDATE型へ変換が必要)
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  DATE_ADD(DATE(reserve_datetime), INTERVAL 1 MONTH) AS reserve_datetime_add1month
+FROM
+  `kaggle_recruit_data.air_reserve`
 ```
 
 ### (DATE/TIME/DATETIME/TIMESTAMP)_SUB関数
@@ -545,7 +620,16 @@ FROM
 - DATESUB関数無し、DATEADDのINTERVALを負にして対応：SQL Server,Redshift
 - DATESUB関数無し、個別に演算作る必要あり：PostgreSQL,Oracle
 #### 例
-
+1. TIMESTAMP型のreserve_datetimeに、1週間減算した値を出力(TIMESTAMP型はpart:WEEKに対応していないため、DATE()でDATE型へ変換が必要)
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  DATE_SUB(DATE(reserve_datetime), INTERVAL 1 WEEK) AS reserve_datetime_sub1week
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
 
 ### (DATE/TIME/DATETIME/TIMESTAMP)_TRUNC関数
 #### 説明
@@ -557,6 +641,41 @@ FROM
 - TRUNC：Oracle
 - DATE_TRUNC関数無し、個別に演算作る必要あり：MySQL,SQL Server
 #### 例
+1. reserve_date_timeをその年月の中で最も小さい日付に変換する。
+   (例：2016-10-31 --> 2016-10-01)
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  DATE_TRUNC(DATE(reserve_datetime), MONTH) AS firstday_reserve_datetime_month
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
+
+2. reserve_date_timeをその日付が該当する週の中での1日目(デフォルトである日曜日)に変換する。
+   (例：2016-10-14 --> 2016-10-09)
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  DATE_TRUNC(DATE(reserve_datetime), WEEK) AS firstday_reserve_datetime_week
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
+
+3. reserve_date_timeをその日付が該当する週の中での1日目(月曜日に変更)に変換する。
+   (例：2016-10-14 --> 2016-10-10)
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  DATE_TRUNC(DATE(reserve_datetime), WEEK(MONDAY)) AS firstday_reserve_datetime_week
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
 
 
 ### FORMAT_(DATE/TIME/DATETIME/TIMESTAMP)関数
@@ -572,6 +691,7 @@ FROM
 上記以外にもたくさんのフォーマットがある、下記公式ドキュメントを参照。<br>
 https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators?hl=ja#supported_format_elements_for_timestamp
 
+<br>
 <br>
 使用するDBによって、表記と使い方が異なるため要確認。<br>
 以下は、「FORMAT_DATE」の例
@@ -589,9 +709,36 @@ SELECT
   reserve_datetime,
   FORMAT_TIMESTAMP("%F %A", reserve_datetime) AS date_weekday
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
 
+
+## 型変換関数
+
+### CAST関数
+#### 説明
+型の変換を行う関数。型の一覧は以下の公式ドキュメントを見る。<br>
+https://cloud.google.com/bigquery/docs/reference/standard-sql/conversion_rules?hl=ja#coercion
+
+#### 例
+1. reserve_datetimeをSTRING型に変換する
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  CAST(reserve_datetime AS STRING) AS str_reserve_datetime
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
+
+2. latitude(FLOAT型)をINT64型に変換する。latitudeの少数第一位で四捨五入された結果が出力される。
+```
+SELECT
+  latitude,
+  CAST(latitude AS INT64) AS INT64_latitude
+FROM `kaggle_recruit_data.air_store_info`
+```
 
 ## 集合演算子（複数のクエリの和・差・積）
 
@@ -607,14 +754,14 @@ Bigqueryの場合は、UNIONだけではエラーになるため、以下のど�
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_area_name LIKE 'Tōkyō-to%'
 UNION DISTINCT
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_genre_name = 'Dining bar'
 ```
@@ -631,14 +778,14 @@ Bigqueryの場合は、EXCEPTだけではエラーになるため、「EXCEPT DI
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_area_name LIKE 'Tōkyō-to%'
 EXCEPT DISTINCT
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_genre_name = 'Dining bar'
 ```
@@ -656,27 +803,176 @@ Bigqueryの場合は、INTERSECTだけではエラーになるため、「INTERS
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_area_name LIKE 'Tōkyō-to%'
 INTERSECT DISTINCT
 SELECT
   *
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_store_info`
+  `kaggle_recruit_data.air_store_info`
 WHERE
   air_genre_name = 'Dining bar'
 ```
 
 
 ## 副問合せ(サブクエリ)
-あるクエリの結果に対して、別のクエリを実行したいときに使用するのが副問合せ、サブクエリとも言う。<br>
+あるクエリの結果を用いて、別のクエリを実行したいときに使用するのが副問合せ、サブクエリとも言う。<br>
 FROM句の中で書くことも出来るが、可読性が落ちる場合が多いため、WITH句で書くことを推奨。
+
+### 単一行副問合せ
+#### 説明
+サブクエリが出力する結果を1列1レコードとして用いる手法のこと。
+#### 例
+1. reserve_visitorsが、reserve_visitors全レコード平均値以上であるレコードを出力する
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  reserve_visitors
+FROM
+  `kaggle_recruit_data.air_reserve`
+WHERE
+  reserve_visitors >= (
+    SELECT
+      AVG(reserve_visitors)
+    FROM
+      `kaggle_recruit_data.air_reserve`
+  )
+```
+
+### WITH句
+#### 説明
+サブクエリを主となるSELECT文の中に書くのではなく、外に出して書くことが出来るようになるのがWITH句。<br>
+- WITH句を用いるメリット
+  - クエリのネストが深くならないので、クエリの可読性が上がる
+  - 同じサブクエリを何度も使いたい場合、1度WITH句で定義することで使いまわせる
+
+<br>
+また、一度WITH句では複数のサブクエリが定義可能であり、同じクエリ内の後続で定義するサブクエリでは、事前に定義されているサブクエリが使用可能。文章ではわかりづらいため、以下の例3でも実践する。
+
+#### 例
+1. reserve_visitorsが、reserve_visitors全レコード平均値以上であるレコードを出力する（WITH句ver）
+```
+WITH avg_reserve_visitors AS (
+  SELECT
+    AVG(reserve_visitors) AS avg_reserve_visitors
+  FROM
+    `kaggle_recruit_data.air_reserve`
+)
+SELECT
+  A.air_store_id,
+  A.visit_datetime,
+  A.reserve_datetime,
+  A.reserve_visitors
+FROM
+  `kaggle_recruit_data.air_reserve` A,
+  avg_reserve_visitors SUB
+WHERE
+  reserve_visitors >= SUB.avg_reserve_visitors
+```
+
+2. air_visit_dataのair_store_id別のレコード数を、air_reserveテーブルに左外部結合する
+```
+WITH record_count_of_visit_data AS (
+  SELECT
+    air_store_id,
+    count(*) AS record_count
+  FROM
+    `kaggle_recruit_data.air_visit_data`
+  GROUP BY
+    air_store_id
+)
+SELECT
+  A.air_store_id,
+  A.visit_datetime,
+  A.reserve_datetime,
+  A.reserve_visitors,
+  B.record_count
+FROM
+  `kaggle_recruit_data.air_reserve` A
+LEFT OUTER JOIN
+  record_count_of_visit_data B
+ON
+  A.air_store_id = B.air_store_id
+```
+
+3. air_visit_dataのvisitorsが、visitorsの全レコード平均値以上であるデータの中で、air_store_id別にレコード数を集計する。その後、この集計したレコード数を、air_reserveテーブルに左外部結合する
+```
+WITH avg_visitors_tbl AS (
+  SELECT
+    AVG(visitors) AS avg_visitors
+  FROM
+    `kaggle_recruit_data.air_visit_data`
+),record_count_of_visit_data AS (
+  SELECT
+    A.air_store_id,
+    count(*) AS record_count
+  FROM
+    `kaggle_recruit_data.air_visit_data` A,
+    avg_visitors_tbl SUB1
+  WHERE
+    A.visitors >= SUB1.avg_visitors
+  GROUP BY
+    air_store_id
+)
+SELECT
+  B.air_store_id,
+  B.visit_datetime,
+  B.reserve_datetime,
+  B.reserve_visitors,
+  C.record_count
+FROM
+  `kaggle_recruit_data.air_reserve` B
+LEFT OUTER JOIN
+  record_count_of_visit_data C
+ON
+  B.air_store_id = C.air_store_id
+```
+
+### EXISTS句
+#### 説明
+
+#### 例
+1. aaaa
+```
+
+```
+
+### ALL句
+#### 説明
+
+#### 例
+1. aaaa
+```
+
+```
 
 
 
 ## 分析関数 (主にWINDOW関数)
+### WINDOWS関数
+#### 説明
+あるテーブル内でGROUP BYを用いたような集計値を、元のテーブルのレコード数を変更することなく、元テーブルに1列追加することができる関数。<br>
+例えば、「該当レコードの売上値/該当レコードが含まれる年の売上合計値」のようなデータが欲しいときに便利。<br>
+WINDOW関数がないと、この「該当レコードの売上値/該当レコードが含まれる年の売上合計値」は記述に手間がかかる上、可読性も落ちてしまう。<br>
+以下は、WINDOW関数がない場合の手順例。
+1. 年間の売上合計値を集計するクエリをGROUP BYを用いて作る
+2. 前工程で作成したクエリをサブクエリとして、元テーブルに対して左外部結合させるクエリを書く。
 
+#### 例
+1. air_store_id、visit_datetimeの年、visit_datetimeの月、この3項目別にreserve_visitorsの集計値をとり、新しくvisitors_summary_YYMMとして1列付与する
+```
+SELECT
+  air_store_id,
+  visit_datetime,
+  reserve_datetime,
+  reserve_visitors,
+  SUM(reserve_visitors) OVER (PARTITION BY air_store_id, EXTRACT(YEAR FROM visit_datetime), EXTRACT(MONTH FROM visit_datetime)) AS visitors_summary_YYMM
+FROM
+  `kaggle_recruit_data.air_reserve`
+```
 
 
 ## その他DML(Data Manipulation Language)
@@ -709,5 +1005,5 @@ https://cloud.google.com/bigquery/docs/reference/standard-sql/data-definition-la
 SELECT
   air_store_id
 FROM
-  `bigquery-trial-243206.kaggle_recruit_data.air_reserve`
+  `kaggle_recruit_data.air_reserve`
 ```
